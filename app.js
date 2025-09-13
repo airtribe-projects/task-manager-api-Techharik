@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const port = 3000;
+// const port = 3000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -8,9 +8,10 @@ app.use(express.urlencoded({ extended: true }));
 const tasks = [
     {
         id: 1,
-        title: 'Default',
-        description: 'Default Task Complete',
-        completed: false
+        title: "Set up environment",
+        description: "Install Node.js, npm, and git",
+        completed: true,
+
     }
 ]
 
@@ -21,29 +22,93 @@ app.get('/', (req, res) => {
 app.post("/tasks", (req, res) => {
     const { title, description, completed } = req.body;
 
-    if (!title || !description || !completed) {
-        res.status(400).json('All the fileds are required.');
+    // Validation
+    if (!title || !description || typeof completed !== "boolean") {
+        return res.status(400).json({ error: "All fields are required." });
     }
-    const newtask = {
-        id: tasks.length + 1, title, description, complete
-    }
-    tasks.push(newtask);
 
-    res.status(201).json(newtask)
+    const newTask = {
+        id: tasks.length + 1,
+        title,
+        description,
+        completed,
+
+    };
+
+    tasks.push(newTask);
+
+    res.status(201).json(newTask);
+});
+
+
+app.get("/tasks", (req, res) => {
+    const { completed } = req.query;
+    let result = tasks
+    console.log(completed)
+    if (completed != undefined) {
+        result = result.filter((t) => t.completed.toString() === completed)
+    }
+    console.log(result)
+    res.status(200).json(result);
+});
+
+app.get("/tasks/:id", (req, res) => {
+    const id = req.params.id;
+
+    const task = tasks.find((t) => t.id === parseInt(id));
+    if (!task) {
+        return res.status(404).json({
+            message: "Invaild Id"
+        })
+    }
+    res.status(200).json(task)
+})
+
+app.put("/tasks/:id", (req, res) => {
+    const id = req.params.id;
+    const { title, description, completed } = req.body;
+
+    // Validation
+    if (!title || !description || typeof completed !== "boolean") {
+        return res.status(400).json({ error: "All fields are required." });
+    }
+
+    const task = tasks.find((t) => t.id === parseInt(id));
+
+    if (!task) {
+        return res.status(404).json({
+            message: 'Invalid Id'
+        })
+    }
+
+    task.title = title;
+    task.description = description;
+    task.completed = completed;
+
+    tasks.push(task);
+    console.log(task)
+    res.status(200).json(task)
+
+})
+
+app.delete("/tasks/:id", (req, res) => {
+    const id = req.params.id;
+    const task = tasks.find((t) => t.id === parseInt(id));
+
+    if (!task) {
+        return res.status(404).json({
+            message: 'Invalid Id'
+        })
+    }
+    const taskIndex = tasks.indexOf(id);
+    tasks.slice(taskIndex, 1);
+    res.status(200).json({
+        message: 'task deleted Successfully'
+    })
 
 })
 
 
-app.get("/tasks", (req, res) => {
-    res.status(200).json(tasks);
-});
-
-app.listen(port, (err) => {
-    if (err) {
-        return console.log('Something bad happened', err);
-    }
-    console.log(`Server is listening on ${port}`);
-});
 
 
 
