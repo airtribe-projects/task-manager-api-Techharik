@@ -80,13 +80,11 @@ app.put("/tasks/:id", (req, res) => {
             message: 'Invalid Id'
         })
     }
-
+    task.id = parseInt(id)
     task.title = title;
     task.description = description;
     task.completed = completed;
 
-    tasks.push(task);
-    console.log(task)
     res.status(200).json(task)
 
 })
@@ -100,8 +98,8 @@ app.delete("/tasks/:id", (req, res) => {
             message: 'Invalid Id'
         })
     }
-    const taskIndex = tasks.indexOf(id);
-    tasks.slice(taskIndex, 1);
+    const taskIndex = tasks.indexOf(task)
+    tasks.splice(taskIndex, 1);
     res.status(200).json({
         message: 'task deleted Successfully'
     })
