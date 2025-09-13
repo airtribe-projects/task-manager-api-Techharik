@@ -1,6 +1,5 @@
 const express = require('express');
 const app = express();
-// const port = 3000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -10,8 +9,7 @@ const tasks = [
         id: 1,
         title: "Set up environment",
         description: "Install Node.js, npm, and git",
-        completed: true,
-
+        completed: true
     }
 ]
 
@@ -45,7 +43,7 @@ app.get("/tasks", (req, res) => {
     const { completed } = req.query;
     let result = tasks
     console.log(completed)
-    if (completed != undefined) {
+    if (completed !== undefined) {
         result = result.filter((t) => t.completed.toString() === completed)
     }
     console.log(result)
@@ -58,7 +56,7 @@ app.get("/tasks/:id", (req, res) => {
     const task = tasks.find((t) => t.id === parseInt(id));
     if (!task) {
         return res.status(404).json({
-            message: "Invaild Id"
+            message: "Invalid  Id"
         })
     }
     res.status(200).json(task)
